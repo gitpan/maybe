@@ -2,11 +2,11 @@
 
 package maybe;
 use 5.006;
-our $VERSION = 0.01;
+our $VERSION = 0.01_01;
 
 =head1 NAME
 
-maybe - use a Perl module and ignore error if can't be loaded
+maybe - Use a Perl module and ignore error if can't be loaded
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,7 @@ maybe - use a Perl module and ignore error if can't be loaded
   }
 
   use maybe 'Carp' => 'confess';
-  use constant HAS_CARP => !! CARP->VERSION;
+  use constant HAS_CARP => !! Carp->VERSION;
   if (HAS_CARP) {  # compilation-time checking
     confess("Bum!");
   }

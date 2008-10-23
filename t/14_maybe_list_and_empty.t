@@ -26,6 +26,6 @@ eval q{
     use maybe 'maybe::Test1' => 'string', '';
 };
 is( $@, '',                                          'use maybe "maybe::Test1" succeed' );
-is( $INC{'maybe/Test1.pm'}, 't/tlib/maybe/Test1.pm', '%INC for maybe/Test1.pm is set' );
+isnt( $INC{'maybe/Test1.pm'}, undef,                 '%INC for maybe/Test1.pm is set' );
 is( maybe::Test1->VERSION, 123,                      'maybe::Test1->VERSION == 123' );
 is( $maybe::Test1::is_ok, 'string',                  '$maybe::Test1::is_ok eq "string"' );

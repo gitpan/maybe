@@ -1,4 +1,12 @@
 ------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@debian.org> | 2008-10-23
+
+Fixes:
+
+* Do not test loading a module with compilation error.
+* Minor POD changes.
+
+------------------------------------------------------------------------
 0.01 | Piotr Roszatycki <dexter@debian.org> | 2008-10-21
 
 * Initial release.

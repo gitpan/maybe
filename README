@@ -1,5 +1,5 @@
 NAME
-    maybe - use a Perl module and ignore error if can't be loaded
+    maybe - Use a Perl module and ignore error if can't be loaded
 
 SYNOPSIS
       use Getopt::Long;
@@ -12,7 +12,7 @@ SYNOPSIS
       }
 
       use maybe 'Carp' => 'confess';
-      use constant HAS_CARP => !! CARP->VERSION;
+      use constant HAS_CARP => !! Carp->VERSION;
       if (HAS_CARP) {  # compilation-time checking
         confess("Bum!");
       }
