@@ -15,7 +15,7 @@ BEGIN {
     unshift @INC, File::Spec->catdir($cwd, 't/tlib');
 }
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 local $SIG{__WARN__} = sub { BAIL_OUT( $_[0] ) };
 
@@ -25,7 +25,8 @@ no warnings 'once';
 eval q{
     use maybe 'maybe::Test1' => undef;
 };
-is( $@, '',                                          'use maybe "maybe::Test1" succeed' );
-isnt( $INC{'maybe/Test1.pm'}, undef,                 '%INC for maybe/Test1.pm is set' );
-is( maybe::Test1->VERSION, 123,                      'maybe::Test1->VERSION == 123' );
-is( $maybe::Test1::is_ok, '1',                       '$maybe::Test1::is_ok == 1' );
+is( $@, '',                                              'use maybe "maybe::Test1" succeed' );
+ok( maybe->HAVE_MAYBE_TEST1,                             'maybe->HAVE_MAYBE_TEST1 is true' );
+isnt( $INC{'maybe/Test1.pm'}, undef,                     '%INC for maybe/Test1.pm is set' );
+is( maybe::Test1->VERSION, 123,                          'maybe::Test1->VERSION == 123' );
+is( $maybe::Test1::is_ok, '1',                           '$maybe::Test1::is_ok == 1' );

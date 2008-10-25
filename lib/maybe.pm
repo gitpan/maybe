@@ -2,7 +2,7 @@
 
 package maybe;
 use 5.006;
-our $VERSION = 0.01_01;
+our $VERSION = 0.02;
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ maybe - Use a Perl module and ignore error if can't be loaded
 
   use Getopt::Long;
   use maybe 'Getopt::Long::Descriptive';
-  if (Getopt::Long::Descriptive->VERSION) {  # run-time checking
+  if (maybe::HAVE_GETOPT_LONG_DESCRIPTIVE) {
     Getopt::Long::Descriptive::describe_options("usage: %c %o", @options);
   }
   else {
@@ -20,8 +20,7 @@ maybe - Use a Perl module and ignore error if can't be loaded
   }
 
   use maybe 'Carp' => 'confess';
-  use constant HAS_CARP => !! Carp->VERSION;
-  if (HAS_CARP) {  # compilation-time checking
+  if (maybe::HAVE_CARP) {
     confess("Bum!");
   }
   else {
@@ -33,6 +32,8 @@ maybe - Use a Perl module and ignore error if can't be loaded
 This pragma loads a Perl module.  If the module can't be loaded, the
 error will be ignored.  Otherwise, the module's import method is called
 with unchanged caller stack.
+
+The special constant B<maybe::HAVE_I<MODULE>> is created and it
 
 =for readme stop
 
@@ -50,6 +51,10 @@ sub import {
     my $package = shift @_;
     return unless $package;
 
+    my $macro = $package;
+    $macro =~ s{(::|[^A-Za-z0-9_])}{_}g;
+    $macro = 'HAVE_' . uc($macro);
+
     my $file = $package . '.pm';
     $file =~ s{::}{/}g;
 
@@ -57,7 +62,7 @@ sub import {
     eval {
         require $file;
     };
-    return if $@;
+    goto ERROR if $@;
 
     # Check version if first element on list is a version number.
     if (defined $_[0] and $_[0] =~ m/^\d/) {
@@ -65,8 +70,12 @@ sub import {
         eval {
             $package->VERSION($version);
         };
-        return if $@;
+        goto ERROR if $@;
     }
+
+    # Package is just loaded
+    undef *{$macro} if defined &$macro;
+    *{$macro} = sub () { !! 1 };
 
     # Do not call import if list contains only empty string.
     return if @_ == 1 and defined $_[0] and $_[0] eq '';
@@ -76,6 +85,14 @@ sub import {
 
     unshift @_, $package;
     goto &$method;
+
+
+    ERROR:
+
+    undef *{$macro} if defined &$macro;
+    *{$macro} = sub () { not 1 };
+
+    return;
 }
 
 
@@ -116,13 +133,33 @@ If the I<LIST> contains only one empty string, it is exactly equivalent to
 
 =back
 
+=head1 CONSTANTS
+
+=over
+
+=item HAVE_I<MODULE>
+
+This constant is set after trying to load the module.  The name of constant is
+created from uppercased module name.  The "::" string and any non-alphanumeric
+character is replaced with underscore.  The constant contains the true value
+if the module was loaded or false value otherwise.
+
+  use maybe 'File::Spec::Win32';
+  return unless maybe::HAVE_FILE_SPEC_WIN32;
+
+=back
+
 =head1 SEE ALSO
 
 L<if>, L<all>, L<first>.
 
 =head1 BUGS
 
-If you find the bug, please report it.
+The Perl doesn't clean up the module if it wasn't loaded to the end, i.e.
+because of syntax error.
+
+The name of constant could be the same for different modules, i.e. "Module",
+"module" and "MODULE" generate maybe::HAVE_MODULE constant.
 
 =for readme continue
 

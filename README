@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
       use Getopt::Long;
       use maybe 'Getopt::Long::Descriptive';
-      if (Getopt::Long::Descriptive->VERSION) {  # run-time checking
+      if (maybe::HAVE_GETOPT_LONG_DESCRIPTIVE) {
         Getopt::Long::Descriptive::describe_options("usage: %c %o", @options);
       }
       else {
@@ -12,8 +12,7 @@ SYNOPSIS
       }
 
       use maybe 'Carp' => 'confess';
-      use constant HAS_CARP => !! Carp->VERSION;
-      if (HAS_CARP) {  # compilation-time checking
+      if (maybe::HAVE_CARP) {
         confess("Bum!");
       }
       else {
@@ -24,6 +23,8 @@ DESCRIPTION
     This pragma loads a Perl module. If the module can't be loaded, the
     error will be ignored. Otherwise, the module's import method is called
     with unchanged caller stack.
+
+    The special constant maybe::HAVE_*MODULE* is created and it
 
 AUTHOR
     Piotr Roszatycki <dexter@debian.org>

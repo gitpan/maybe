@@ -3,11 +3,11 @@ require 5.006;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'PL_FILES' => {},
-          'INSTALLDIRS' => 'site',
           'NAME' => 'maybe',
-          'EXE_FILES' => [],
           'VERSION_FROM' => 'lib/maybe.pm',
-          'PREREQ_PM' => {}
+          'PREREQ_PM' => {},
+          'INSTALLDIRS' => 'site',
+          'EXE_FILES' => [],
+          'PL_FILES' => {}
         )
 ;
