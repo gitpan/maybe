@@ -1,4 +1,11 @@
 ------------------------------------------------------------------------
+0.0201 | Piotr Roszatycki <dexter@debian.org> | 2009-01-03
+
+Changes:
+
+* Use strict and passed Perl::Critic.
+
+------------------------------------------------------------------------
 0.02 | Piotr Roszatycki <dexter@debian.org> | 2008-10-25
 
 New feature:

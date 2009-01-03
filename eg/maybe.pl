@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I../lib
+#!/usr/bin/perl -Ilib -I../lib
 
 use maybe 'Does::Not::Exist';
 

@@ -1,8 +1,6 @@
 #!/usr/bin/perl -c
 
 package maybe;
-use 5.006;
-our $VERSION = 0.02;
 
 =head1 NAME
 
@@ -40,13 +38,18 @@ The special constant B<maybe::HAVE_I<MODULE>> is created and it
 =cut
 
 
-# no strict;
-# no warnings;
+use 5.006;
+use strict;
+use warnings;
 
+our $VERSION = 0.02_01;
+
+
+## no critic (RequireArgUnpacking)
 
 # Pragma handling
 sub import {
-    shift @_;  # eq __PACKAGE__
+    shift;
 
     my $package = shift @_;
     return unless $package;
@@ -58,24 +61,25 @@ sub import {
     my $file = $package . '.pm';
     $file =~ s{::}{/}g;
 
-    local $SIG{__DIE__};
+    local $SIG{__DIE__} = '';
     eval {
         require $file;
-    };
-    goto ERROR if $@;
+    } or goto ERROR;
 
     # Check version if first element on list is a version number.
     if (defined $_[0] and $_[0] =~ m/^\d/) {
         my $version = shift @_;
         eval {
             $package->VERSION($version);
-        };
-        goto ERROR if $@;
-    }
+        } or goto ERROR;
+    };
 
     # Package is just loaded
-    undef *{$macro} if defined &$macro;
-    *{$macro} = sub () { !! 1 };
+    {
+        no strict 'refs';
+        undef *{$macro} if defined &$macro;
+        *{$macro} = sub () { !! 1 };
+    };
 
     # Do not call import if list contains only empty string.
     return if @_ == 1 and defined $_[0] and $_[0] eq '';
@@ -89,11 +93,14 @@ sub import {
 
     ERROR:
 
-    undef *{$macro} if defined &$macro;
-    *{$macro} = sub () { not 1 };
+    {
+        no strict 'refs';
+        undef *{$macro} if defined &$macro;
+        *{$macro} = sub () { !! '' };
+    };
 
     return;
-}
+};
 
 
 1;
@@ -169,7 +176,7 @@ Piotr Roszatycki E<lt>dexter@debian.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2008 by Piotr Roszatycki E<lt>dexter@debian.orgE<gt>.
+Copyright (C) 2008, 2009 by Piotr Roszatycki E<lt>dexter@debian.orgE<gt>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
