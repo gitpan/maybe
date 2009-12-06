@@ -11,7 +11,7 @@ BEGIN {
     unshift @INC, File::Spec->catdir($cwd, 't/tlib');
 }
 
-use Test::More tests => 20;
+use Test::More tests => 24;
 
 local $SIG{__WARN__} = sub { BAIL_OUT( $_[0] ) };
 
@@ -49,6 +49,14 @@ like( $@, qr/did not return a true value/,               'use maybe::Test4 faile
 is( $INC{'maybe/Test4.pm'}, undef,                       '%INC for maybe/Test4.pm is undef' );
 is( maybe::Test4->VERSION, 123,                          'maybe::Test4->VERSION == 123' );
 is( $maybe::Test4::is_ok, 0,                             '$maybe::Test4::is_ok == 0' );
+
+eval q{
+    use maybe::Test6 0;
+};
+is( $@, '',                                              'use maybe::Test0 succeed' );
+isnt( $INC{'maybe/Test6.pm'}, undef,                     '%INC for maybe/Test6.pm is set' );
+is( maybe::Test6->VERSION, 0,                            'maybe::Test6->VERSION == 0' );
+is( $maybe::Test6::is_ok, 1,                             '$maybe::Test6::is_ok == 1' );
 
 eval q{
     use maybe::Test0 123;

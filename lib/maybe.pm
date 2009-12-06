@@ -22,7 +22,7 @@ maybe - Use a Perl module and ignore error if can't be loaded
     confess("Bum!");
   }
   else {
-    die("Bum!);
+    die("Bum!");
   }
 
 =head1 DESCRIPTION
@@ -31,7 +31,8 @@ This pragma loads a Perl module.  If the module can't be loaded, the
 error will be ignored.  Otherwise, the module's import method is called
 with unchanged caller stack.
 
-The special constant B<maybe::HAVE_I<MODULE>> is created and it
+The special constant C<maybe::HAVE_I<MODULE>> is created and it can be used
+to enable or disable block of code at compile time.
 
 =for readme stop
 
@@ -39,10 +40,11 @@ The special constant B<maybe::HAVE_I<MODULE>> is created and it
 
 
 use 5.006;
+
 use strict;
 use warnings;
 
-our $VERSION = 0.02_01;
+our $VERSION = '0.0202';
 
 
 ## no critic (RequireArgUnpacking)
@@ -58,8 +60,7 @@ sub import {
     $macro =~ s{(::|[^A-Za-z0-9_])}{_}g;
     $macro = 'HAVE_' . uc($macro);
 
-    my $file = $package . '.pm';
-    $file =~ s{::}{/}g;
+    (my $file = $package . '.pm') =~ s{::}{/}g;
 
     local $SIG{__DIE__} = '';
     eval {
@@ -71,6 +72,7 @@ sub import {
         my $version = shift @_;
         eval {
             $package->VERSION($version);
+            1;
         } or goto ERROR;
     };
 
@@ -90,9 +92,7 @@ sub import {
     unshift @_, $package;
     goto &$method;
 
-
     ERROR:
-
     {
         no strict 'refs';
         undef *{$macro} if defined &$macro;
@@ -105,8 +105,6 @@ sub import {
 
 1;
 
-
-__END__
 
 =head1 USAGE
 
@@ -154,6 +152,14 @@ if the module was loaded or false value otherwise.
   use maybe 'File::Spec::Win32';
   return unless maybe::HAVE_FILE_SPEC_WIN32;
 
+As any constant value it can be used to enable or disable the block code at
+compile time.
+
+  if (maybe::HAVE_FILE_SPEC_WIN32) {
+      # This block is compiled only if File::Spec::Win32 was loaded
+      do_something;
+  }
+
 =back
 
 =head1 SEE ALSO
@@ -168,15 +174,18 @@ because of syntax error.
 The name of constant could be the same for different modules, i.e. "Module",
 "module" and "MODULE" generate maybe::HAVE_MODULE constant.
 
+If you find the bug or want to implement new features, please report it at
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=maybe>
+
 =for readme continue
 
 =head1 AUTHOR
 
-Piotr Roszatycki E<lt>dexter@debian.orgE<gt>
+Piotr Roszatycki <dexter@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2008, 2009 by Piotr Roszatycki E<lt>dexter@debian.orgE<gt>.
+Copyright (C) 2008, 2009 by Piotr Roszatycki <dexter@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
